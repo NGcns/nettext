@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>간단한 계산기</title>
+	<style>
+		table, td {
+			border: 1px solid black;
+			border-collapse: collapse;
+			padding: 10px;
+			text-align: center;
+		}
+		input[type="button"] {
+			width: 100%;
+			height: 100%;
+			font-size: 20px;
+		}
+	</style>
+</head>
+<body>
+	<h1>간단한 계산기</h1>
+	<table>
+		<tr>
+			<td colspan="2"><input type="text" id="result" readonly></td>
+			<td><input type="button" value="C" onclick="clearResult()"></td>
+			<td><input type="button" value="=" onclick="calculate()"></td>
+		</tr>
+		<tr>
+			<td><input type="button" value="7" onclick="addNumber('7')"></td>
+			<td><input type="button" value="8" onclick="addNumber('8')"></td>
+			<td><input type="button" value="9" onclick="addNumber('9')"></td>
+			<td><input type="button" value="+" onclick="addOperator('+')"></td>
+		</tr>
+		<tr>
+			<td><input type="button" value="4" onclick="addNumber('4')"></td>
+			<td><input type="button" value="5" onclick="addNumber('5')"></td>
+			<td><input type="button" value="6" onclick="addNumber('6')"></td>
+			<td><input type="button" value="-" onclick="addOperator('-')"></td>
+		</tr>
+		<tr>
+			<td><input type="button" value="1" onclick="addNumber('1')"></td>
+			<td><input type="button" value="2" onclick="addNumber('2')"></td>
+			<td><input type="button" value="3" onclick="addNumber('3')"></td>
+			<td><input type="button" value="*" onclick="addOperator('*')"></td>
+		</tr>
+		<tr>
+			<td><input type="button" value="0" onclick="addNumber('0')"></td>
+			<td><input type="button" value="." onclick="addDecimalPoint()"></td>
+			<td><input type="button" value="/" onclick="addOperator('/')"></td>
+			<td><input type="button" value="%" onclick="addOperator('%')"></td>
+		</tr>
+	</table>
+	<script>
+		let result = document.getElementById("result");
+		let operator = null;
+		let operand1 = null;
+		let operand2 = null;
+		
+		function clearResult() {
+			result.value = "";
+			operator = null;
+			operand1 = null;
+			operand2 = null;
+		}
+		
+		function addNumber(number) {
+			result.value += number;
+		}
+		
+		function addDecimalPoint() {
+    if (result.value.indexOf(".") === -1) {
+        result.value += ".";
+    }
+}
+
+    function addOperator(op) {
+		operator = op;
+		operand1 = parseFloat(result.value);
+		result.value = "";
+	}
+	
+	function calculate() {
+		if (operator === null) {
+			return;
+		}
+		
+		operand2 = parseFloat(result.value);
+		
+		if (operator === "+") {
+			result.value = operand1 + operand2;
+		} else if (operator === "-") {
+			result.value = operand1 - operand2;
+		} else if (operator === "*") {
+			result.value = operand1 * operand2;
+		} else if (operator === "/") {
+			result.value = operand1 / operand2;
+		} else if (operator === "%") {
+			result.value = operand1 % operand2;
+		}
+		
+		operator = null;
+		operand1 = null;
+		operand2 = null;
+	    }
+      
+      </script>
+</body>
+</html>
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>마우스 클릭 ( 숫자 찾기 ) </title>
+	<style>
+		td {
+			width:50px;
+			height:50px;
+			border:1px solid black;
+			text-align:center;
+			vertical-align:middle;
+			font-size:20px;
+			font-weight:bold;
+			cursor:pointer;
+		}
+	</style>
+</head>
+<body>
+	<h3>숨겨진 숫자 찾기 게임</h3><hr>
+	<table>
+		<tbody id="table">
+		</tbody>
+	</table>
+	<script>
+		const table = document.getElementById("table");
+		const rows = 10;
+		const cols = 10;
+		const nums = Array.from({ length: rows * cols }, (_, idx) => idx + 1);
+		shuffle(nums);
+		let shown = Array.from({ length: rows * cols }, () => false);
+		let selected = null;
+
+		for (let i = 0; i < rows; i++) {
+			const row = document.createElement("tr");
+			for (let j = 0; j < cols; j++) {
+				const cell = document.createElement("td");
+				cell.dataset.idx = i * cols + j;
+				cell.addEventListener("click", handleClick);
+				row.appendChild(cell);
+			}
+			table.appendChild(row);
+		}
+
+		function handleClick(event) {
+			const cell = event.target;
+			const idx = Number(cell.dataset.idx);
+			if (shown[idx]) {
+				return;
+			}
+			shown[idx] = true;
+			cell.textContent = nums[idx];
+			cell.style.backgroundColor = "lightblue";
+			if (selected === null) {
+				selected = idx;
+			} else {
+				const prevCell = table.querySelector(`[data-idx="${selected}"]`);
+				if (nums[selected] === nums[idx]) {
+					cell.style.backgroundColor = prevCell.style.backgroundColor = "lightgreen";
+				} else {
+					setTimeout(() => {
+						cell.textContent = prevCell.textContent = "";
+						cell.style.backgroundColor = prevCell.style.backgroundColor = "";
+						shown[idx] = shown[selected] = false;
+					}, 1000);
+				}
+				selected = null;
+			}
+		}
+
+		function shuffle(array) {
+			for (let i = array.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[array[i], array[j]] = [array[j], array[i]];
+			}
+		}
+	</script>
+</body>
+</html>
