@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-do List</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    #todoForm {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    #todoForm input {
+      flex-grow: 1;
+      margin-right: 10px;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+    #todoForm button {
+      padding: 5px 10px;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    #todoForm button:hover {
+      background-color: #0056b3;
+    }
+    .options {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .options button {
+      padding: 5px 10px;
+      background-color: #28A745;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .options button:hover {
+      background-color: #1e7e34;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      padding: 10px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>To-do List</h1>
+    <form id="todoForm">
+      <input type="text" id="title" placeholder="Title" />
+      <input type="date" id="date" />
+      <button type="submit">Add</button>
+    </form>
+    <h2>Options</h2>
+    <div class="options">
+      <button id="ls">List All</button>
+      <button id="ls_name_asc">Sort by Title (A-Z)</button>
+      <button id="ls_name_desc">Sort by Title (Z-A)</button>
+      <button id="ls_date">Sort by Date</button>
+    </div>
+    <h3>할 일 목록</h3>
+    <ul id="todoList"></ul>
+
+    <h3>완료한 일 목록</h3>
+    <ul id="completedList"></ul>
+
+    <script>
+      class Todo {
+        constructor(title, date, completed = false) {
+          this.title = title;
+          this.date = date;
+          this.completed = completed;
+        }
+      }
+    
+      class TodoManager {
+        constructor() {
+          this.todos = this.loadFromLocalStorage();
+        }
+    
+        loadFromLocalStorage() {
+          const storedTodos = localStorage.getItem('todos');
+          return storedTodos ? JSON.parse(storedTodos).map(todo => new Todo(todo.title, todo.date, todo.completed)) : [];
+        }
+    
+        saveToLocalStorage() {
+          localStorage.setItem('todos', JSON.stringify(this.todos));
+        }
+    
+        add(title, date) {
+          this.todos.push(new Todo(title, date));
+        }
+    
+        ls_name_asc() {
+          this.todos.sort((a, b) => a.title.localeCompare(b.title));
+        }
+    
+        ls_name_desc() {
+          this.todos.sort((a, b) => b.title.localeCompare(a.title));
+        }
+    
+        ls_date() {
+          this.todos.sort((a, b) => new Date(a.date) - new Date(b.date));
+        }
+      }
+    
+      const todoManager = new TodoManager();
+    
+      document.getElementById('todoForm').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const title = document.getElementById('title').value;
+        const date = document.getElementById('date').value;
+    
+        if (title && date) {
+          todoManager.add(title, date);
+          document.getElementById('title').value = '';
+          document.getElementById('date').value = '';
+          updateTodoList();
+        }
+      });
+    
+      document.getElementById('ls_name_asc').addEventListener('click', () => {
+        todoManager.ls_name_asc();
+        updateTodoList();
+      });
+    
+      document.getElementById('ls_name_desc').addEventListener('click', () => {
+        todoManager.ls_name_desc();
+        updateTodoList();
+      });
+    
+      document.getElementById('ls_date').addEventListener('click', () => {
+        todoManager.ls_date();
+        updateTodoList();
+      });
+    
+      function updateTodoList() {
+        const todoList = document.getElementById('todoList');
+        const completedList = document.getElementById('completedList');
+        todoList.innerHTML = '';
+        completedList.innerHTML = '';
+    
+        todoManager.todos.forEach((todo, index) => {
+          const listItem = document.createElement('li');
+          listItem.textContent = `${todo.title} (${todo.date})`;
+    
+          if (todo.completed) {
+            listItem.style.textDecoration = 'line-through';
+          }
+    
+          listItem.addEventListener('click', () => {
+            todo.completed = !todo.completed;
+            updateTodoList();
+          });
+    
+          if (todo.completed) {
+            completedList.appendChild(listItem);
+          } else {
+            todoList.appendChild(listItem);
+          }
+        });
+        todoManager.saveToLocalStorage();
+      }
+    
+      window.addEventListener('load', () => {
+        updateTodoList();
+      });
+    </script>
+      
+
+      
+
+  </div>
+</body>
+</html>
